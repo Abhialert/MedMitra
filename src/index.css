@@ -1710,6 +1710,11 @@ h1, h2, h3, h4 {
   background: var(--bg-body);
 }
 
+/* Push the actual header controls down so they don't hide under the device notch, acting like an iOS safe-area inset */
+.device-content .header {
+  padding-top: 36px;
+}
+
 .device-content .app-container {
   width: 100%;
   max-width: none;
