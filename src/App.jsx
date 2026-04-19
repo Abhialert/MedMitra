@@ -5,6 +5,7 @@ import ResultsDisplay from './components/ResultsDisplay';
 import VerificationPanel from './components/VerificationPanel';
 import LoadingScreen from './components/LoadingScreen';
 import HistoryPage from './components/HistoryPage';
+import CommercialWrapper from './components/CommercialWrapper';
 import { analyzeMedicalDocument, analyzeMedicalDocumentQuiet } from './services/geminiService';
 import { saveToHistory } from './services/historyService';
 import { Pill, History } from 'lucide-react';
@@ -97,8 +98,9 @@ function App() {
   const hi = language === 'hi';
 
   return (
-    <div className="app-container">
-      {/* ─── Header ─── */}
+    <CommercialWrapper language={language}>
+      <div className="app-container">
+        {/* ─── Header ─── */}
       <header className="header">
         <div className="header-title" onClick={() => navigate('/')}>
           <div className="logo-icon">
@@ -188,6 +190,7 @@ function App() {
         )}
       </main>
     </div>
+    </CommercialWrapper>
   );
 }
 
