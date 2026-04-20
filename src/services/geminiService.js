@@ -35,7 +35,7 @@ export const analyzeMedicalDocument = async (imageBase64, language = 'en') => {
     throw new Error('Gemini API key not configured.');
   }
 
-  const modelName = 'gemini-2.5-flash';
+  const modelName = 'gemini-1.5-flash';
   
   const langInstruction = language === 'hi' 
     ? 'Respond entirely in simple Hindi (Devanagari script) that a low-literacy person can understand.' 
@@ -73,32 +73,51 @@ CRITICAL RULES:
   const mimeType = imageBase64.split(';')[0].split(':')[1] || 'image/jpeg';
   const base64Data = imageBase64.split(',')[1];
 
-  try {
-    const response = await ai.models.generateContent({
-      model: modelName,
-      contents: [
-        { inlineData: { data: base64Data, mimeType } },
-        { text: prompt }
-      ]
-    });
+  const maxRetries = 2;
+  const retryDelayMs = 1500;
 
-    const text = response.text;
-    const jsonMatch = text.match(/\{[\s\S]*\}/);
-    if (!jsonMatch) {
-      throw new Error(`Could not parse AI response.`);
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    try {
+      const response = await ai.models.generateContent({
+        model: modelName,
+        contents: [
+          { inlineData: { data: base64Data, mimeType } },
+          { text: prompt }
+        ]
+      });
+
+      const text = response.text;
+      const jsonMatch = text.match(/\{[\s\S]*\}/);
+      if (!jsonMatch) {
+        throw new Error(`Could not parse AI response.`);
+      }
+      
+      return JSON.parse(jsonMatch[0]);
+    } catch (error) {
+      const errorString = error?.message || String(error);
+      const isOverloaded = errorString.includes('503') || error?.status === 503 || errorString.includes('high demand');
+      
+      if (attempt < maxRetries && isOverloaded) {
+        console.warn(`Google Servers busy (503). Retrying attempt ${attempt}...`);
+        await new Promise(resolve => setTimeout(resolve, retryDelayMs));
+        continue;
+      }
+
+      console.error('Gemini error:', error);
+      
+      if (errorString.includes('404') || errorString.includes('not found')) {
+        throw new Error(`Model not available. Check your API key permissions.`);
+      }
+      if (errorString.includes('401') || errorString.includes('API key')) {
+        throw new Error('Invalid API key. Check your .env file.');
+      }
+      
+      if (isOverloaded) {
+        throw new Error('Google AI servers are slightly overloaded. Please wait 10 seconds and try again.');
+      }
+      
+      throw new Error(error.message || 'Failed to analyze. Please try again.');
     }
-    
-    return JSON.parse(jsonMatch[0]);
-  } catch (error) {
-    console.error('Gemini error:', error);
-    
-    if (error.message?.includes('404') || error.message?.includes('not found')) {
-      throw new Error(`Model not available. Check your API key permissions.`);
-    }
-    if (error.message?.includes('401') || error.message?.includes('API key')) {
-      throw new Error('Invalid API key. Check your .env file.');
-    }
-    throw new Error(error.message || 'Failed to analyze. Please try again.');
   }
 };
 
