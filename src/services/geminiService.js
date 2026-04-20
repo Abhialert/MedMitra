@@ -35,7 +35,7 @@ export const analyzeMedicalDocument = async (imageBase64, language = 'en') => {
     throw new Error('Gemini API key not configured.');
   }
 
-  const modelName = 'gemini-2.5-flash-lite';
+  const modelName = 'gemini-flash-latest';
   
   const langInstruction = language === 'hi' 
     ? 'Respond entirely in simple Hindi (Devanagari script) that a low-literacy person can understand.' 
