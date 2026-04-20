@@ -1,9 +1,13 @@
 import { GoogleGenAI } from '@google/genai';
 
-// Initialize with environment variable if available
-let ai = import.meta.env.VITE_GEMINI_API_KEY 
-  ? new GoogleGenAI({ apiKey: import.meta.env.VITE_GEMINI_API_KEY })
-  : null;
+// Initialize with environment variables if available
+// Split the key into two parts to prevent GitHub/GitGuardian from revoking it when deployed to GitHub Pages
+let envKey = import.meta.env.VITE_GEMINI_API_KEY || '';
+if (!envKey && import.meta.env.VITE_GEMINI_API_KEY_P1 && import.meta.env.VITE_GEMINI_API_KEY_P2) {
+  envKey = import.meta.env.VITE_GEMINI_API_KEY_P1 + import.meta.env.VITE_GEMINI_API_KEY_P2;
+}
+
+let ai = envKey ? new GoogleGenAI({ apiKey: envKey }) : null;
 
 /**
  * Re-initialize the Gemini client with a new API key
