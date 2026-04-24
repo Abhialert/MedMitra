@@ -1,13 +1,9 @@
 import { GoogleGenAI } from '@google/genai';
 
-// Initialize with environment variables if available
-// Split the key into two parts to prevent GitHub/GitGuardian from revoking it when deployed to GitHub Pages
-let envKey = import.meta.env.VITE_GEMINI_API_KEY || '';
-if (!envKey && import.meta.env.VITE_GEMINI_API_KEY_P1 && import.meta.env.VITE_GEMINI_API_KEY_P2) {
-  envKey = import.meta.env.VITE_GEMINI_API_KEY_P1 + import.meta.env.VITE_GEMINI_API_KEY_P2;
-}
+// API key is loaded from environment variables (set in Vercel dashboard for production, .env for local dev)
+const API_KEY = import.meta.env.VITE_GEMINI_API_KEY || '';
 
-let ai = envKey ? new GoogleGenAI({ apiKey: envKey }) : null;
+let ai = API_KEY ? new GoogleGenAI({ apiKey: API_KEY }) : null;
 
 /**
  * Re-initialize the Gemini client with a new API key
@@ -35,7 +31,7 @@ export const analyzeMedicalDocument = async (imageBase64, language = 'en') => {
     throw new Error('Gemini API key not configured.');
   }
 
-  const modelName = 'gemini-flash-latest';
+  const modelName = 'gemini-1.5-flash';
   
   const langInstruction = language === 'hi' 
     ? 'Respond entirely in simple Hindi (Devanagari script) that a low-literacy person can understand.' 
