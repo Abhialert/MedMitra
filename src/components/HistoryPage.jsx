@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Trash2, Clock, FileText, ChevronRight, AlertCircle, Inbox } from 'lucide-react';
 import {
   loadHistory,
