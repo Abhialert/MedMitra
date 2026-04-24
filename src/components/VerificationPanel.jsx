@@ -16,13 +16,15 @@ export default function VerificationPanel({ medicines = [], language }) {
 
   useEffect(() => {
     if (!searchName || searchName === 'Unknown') {
-      setSearchResult({ summary: hi ? 'दवा का नाम स्पष्ट नहीं है।' : 'Medicine name is unclear.', url: '#', source: 'none' });
-      setIsLoading(false);
+      setTimeout(() => {
+        setSearchResult({ summary: hi ? 'दवा का नाम स्पष्ट नहीं है।' : 'Medicine name is unclear.', url: '#', source: 'none' });
+        setIsLoading(false);
+      }, 0);
       return;
     }
 
     let cancelled = false;
-    setIsLoading(true);
+    setTimeout(() => setIsLoading(true), 0);
     
     searchMedicineInfo(currentMed.name, currentMed.genericName)
       .then(result => {
@@ -39,7 +41,7 @@ export default function VerificationPanel({ medicines = [], language }) {
       });
 
     return () => { cancelled = true; };
-  }, [currentIndex, searchName]);
+  }, [currentIndex, searchName, currentMed.name, currentMed.genericName, hi]);
 
   return (
     <div className="verify-panel fade-in-up">

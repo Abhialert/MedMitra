@@ -24,7 +24,7 @@ export default function ResultsDisplay({ data, language, capturedImage, onReset 
   useEffect(() => {
     if (isPlaying) {
       stopSpeaking();
-      setIsPlaying(false);
+      setTimeout(() => setIsPlaying(false), 0);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [language]);

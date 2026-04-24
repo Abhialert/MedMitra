@@ -19,13 +19,9 @@ const CONDITION_COLORS = {
 };
 
 export default function HistoryPage({ language, onReview }) {
-  const [entries, setEntries] = useState([]);
+  const [entries, setEntries] = useState(() => loadHistory());
   const [confirmClear, setConfirmClear] = useState(false);
   const hi = language === 'hi';
-
-  useEffect(() => {
-    setEntries(loadHistory());
-  }, []);
 
   const handleDelete = (id, e) => {
     e.stopPropagation();
