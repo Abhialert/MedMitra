@@ -38,40 +38,33 @@ export const analyzeMedicalDocument = async (imageBase64, language = 'en') => {
     : 'Respond in very simple, plain English that a low-literacy person can easily understand.';
 
   const prompt = `
-You are a strictly guarded medical AI validator.
-First, perform a STRICT visual inspection of the image.
+Role: Strict Medical AI.
+Task: Inspect image. Reject if not a physical medicine (box/bottle/strip/prescription). Reject computer screens, code, animals, objects.
 
-RULE 1: The image MUST be a physical photograph of one of the following:
-  - A real medicine box, bottle, tube, label, or blister pack (pill strip).
-  - A real doctor's prescription (handwritten or printed on paper).
-RULE 2: If the image shows a computer screen, a chat window, source code, a keyboard, furniture, people, animals, or any non-medical random objects, YOU MUST REJECT IT immediately.
-
-If it fails RULE 1 or breaks RULE 2, return EXACTLY this JSON and absolutely nothing else:
+If invalid, output strictly:
 {"documentType": "invalid", "patientName": null, "medicines": [], "actionableInstructions": "${language === 'hi' ? 'यह दवा या प्रिस्क्रिप्शन नहीं लग रहा है। कृपया असली दवा का बॉक्स, पत्ता (strip) या प्रिस्क्रिप्शन की स्पष्ट फोटो खींचें।' : 'This does not appear to be a physical medicine or prescription. Please capture a clear photo of a real medicine box, strip, or prescription.'}"}
 
-If and ONLY IF the image is a valid physical medicine or prescription, proceed to extract:
-3. Identify the document type: "label" (for a medicine box/strip/bottle) or "prescription" (doctor's paper list).
-4. For EACH medicine clearly visible, provide:
-   - name: The brand name exactly as written
-   - genericName: The chemical/generic name (e.g., "Paracetamol" for Crocin, "Metformin" for Glycomet). USE YOUR MEDICAL KNOWLEDGE.
-   - usage: What this medicine is commonly prescribed for. USE YOUR MEDICAL KNOWLEDGE even if not written on the label. Be specific (e.g., "Reduces fever and relieves headache, body pain").
-   - condition: EXACTLY ONE keyword from this list that best describes what it treats: "fever", "pain", "heart", "diabetes", "stomach", "infection", "blood_pressure", "brain", "lungs", "skin", "bones", "eyes", "liver", "kidney", "allergy", "thyroid", "blood", "muscle", "ear", "dental", "vitamin", "general"
-   - dosage: How much to take in simple terms (e.g., "One tablet" not "500mg")
-   - sideEffects: Common side effects from YOUR MEDICAL KNOWLEDGE (e.g., "May cause drowsiness or upset stomach")
-   - instructions: When/how to take (e.g., "Take after eating food, morning and night")
-   - timeOfDay: Array of when to take: "morning", "afternoon", "evening", "night"
-   - beforeOrAfterFood: ONE of: "before", "after", "with", "any" — when to take relative to meals
-5. Give a simple summary of what the user should do.
+If valid, extract strictly as JSON:
+- documentType: "label" or "prescription"
+- patientName: string | null
+- actionableInstructions: basic summary of next steps
+- medicines: array of objects containing:
+  * name: brand name
+  * genericName: from medical knowledge (e.g. "Paracetamol")
+  * usage: specific use from medical knowledge (e.g. "Reduces fever and body pain")
+  * condition: ONE keyword: fever, pain, heart, diabetes, stomach, infection, blood_pressure, brain, lungs, skin, bones, eyes, liver, kidney, allergy, thyroid, blood, muscle, ear, dental, vitamin, general
+  * dosage: simple words (e.g. "One tablet" not "500m")
+  * sideEffects: known side effects (e.g. "May cause drowsiness")
+  * instructions: when/how to take (e.g. "After food, morning and night")
+  * timeOfDay: array of: "morning", "afternoon", "evening", "night"
+  * beforeOrAfterFood: "before" | "after" | "with" | "any"
 
 ${langInstruction}
 
-CRITICAL RULES:
-- USE YOUR OWN MEDICAL KNOWLEDGE for usage, side effects, and generic names. Do NOT rely only on what's written on the label.
-- Explain like you're talking to your grandmother. No medical jargon.
-- Output ONLY a JSON object (no markdown formatting, no backticks).
-- If rejected, return ONLY the "invalid" JSON.
-- Valid Document keys: "documentType", "patientName", "medicines" (array), "actionableInstructions"
-- Medicine keys: "name", "genericName", "usage", "condition", "dosage", "sideEffects", "instructions", "timeOfDay", "beforeOrAfterFood"
+RULES:
+- Apply medical knowledge: Do not rely solely on the image for usage, generic names, or side effects.
+- Tone: No medical jargon. Explain simply, like talking to a grandmother.
+- Output ONLY raw JSON. No markdown or backticks.
 `;
 
   const mimeType = imageBase64.split(';')[0].split(':')[1] || 'image/jpeg';
