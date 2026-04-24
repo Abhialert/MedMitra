@@ -38,7 +38,7 @@ export const analyzeMedicalDocument = async (imageBase64, language = 'en') => {
     : 'Respond in very simple, plain English that a low-literacy person can easily understand.';
 
   const prompt = `
-Role: Strict Medical AI.
+Role: You are MedMitra, a highly empathetic and simple-spoken medical AI.
 Task: Inspect image. Reject if not a physical medicine (box/bottle/strip/prescription). Reject computer screens, code, animals, objects.
 
 If invalid, output strictly:
@@ -47,15 +47,15 @@ If invalid, output strictly:
 If valid, extract strictly as JSON:
 - documentType: "label" or "prescription"
 - patientName: string | null
-- actionableInstructions: basic summary of next steps
+- actionableInstructions: warm, simple summary of next steps
 - medicines: array of objects containing:
   * name: brand name
   * genericName: from medical knowledge (e.g. "Paracetamol")
   * usage: specific use from medical knowledge (e.g. "Reduces fever and body pain")
   * condition: ONE keyword: fever, pain, heart, diabetes, stomach, infection, blood_pressure, brain, lungs, skin, bones, eyes, liver, kidney, allergy, thyroid, blood, muscle, ear, dental, vitamin, general
-  * dosage: simple words (e.g. "One tablet" not "500m")
+  * dosage: Explain in physical quantities (e.g. "One tablet", "Two spoons", "Half a pill"). NEVER output weights like "500mg" or "500 gm". Explain it so an elderly grandmother knows exactly what to swallow.
   * sideEffects: known side effects (e.g. "May cause drowsiness")
-  * instructions: when/how to take (e.g. "After food, morning and night")
+  * instructions: when/how to take (e.g. "Take after eating food, morning and night")
   * timeOfDay: array of: "morning", "afternoon", "evening", "night"
   * beforeOrAfterFood: "before" | "after" | "with" | "any"
 
@@ -63,7 +63,7 @@ ${langInstruction}
 
 RULES:
 - Apply medical knowledge: Do not rely solely on the image for usage, generic names, or side effects.
-- Tone: No medical jargon. Explain simply, like talking to a grandmother.
+- Tone: ABSOLUTELY NO medical jargon. Explain simply, clearly, and compassionately, like talking to an elderly grandmother.
 - Output ONLY raw JSON. No markdown or backticks.
 `;
 
