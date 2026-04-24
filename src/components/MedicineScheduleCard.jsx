@@ -1,0 +1,196 @@
+import React, { useRef } from 'react';
+import { Download, Calendar } from 'lucide-react';
+
+/**
+ * MedicineScheduleCard — Generates a visual daily medicine timetable.
+ * Can be downloaded as PNG image for printing / sticking on fridge.
+ * Fully isolated — does NOT modify any existing component.
+ */
+
+const TIME_LABELS = {
+  morning: { en: 'Morning (8 AM)', hi: 'सुबह (8 बजे)', emoji: '🌅', color: '#f59e0b', bg: '#fef3c7' },
+  afternoon: { en: 'Afternoon (1 PM)', hi: 'दोपहर (1 बजे)', emoji: '☀️', color: '#f97316', bg: '#ffedd5' },
+  evening: { en: 'Evening (6 PM)', hi: 'शाम (6 बजे)', emoji: '🌇', color: '#8b5cf6', bg: '#f5f3ff' },
+  night: { en: 'Night (10 PM)', hi: 'रात (10 बजे)', emoji: '🌙', color: '#4338ca', bg: '#eef2ff' },
+};
+
+const FOOD_LABELS = {
+  before: { en: 'Before food', hi: 'खाने से पहले', emoji: '🍽️⬅️' },
+  after: { en: 'After food', hi: 'खाने के बाद', emoji: '🍽️➡️' },
+  with: { en: 'With food', hi: 'खाने के साथ', emoji: '🍽️' },
+  any: { en: 'Any time', hi: 'कभी भी', emoji: '✓' },
+};
+
+export default function MedicineScheduleCard({ medicines = [], patientName, language = 'en' }) {
+  const scheduleRef = useRef(null);
+  const hi = language === 'hi';
+
+  if (!medicines.length) return null;
+
+  // Build schedule: group medicines by time of day
+  const schedule = {};
+  ['morning', 'afternoon', 'evening', 'night'].forEach(time => {
+    const medsAtTime = medicines.filter(m =>
+      (m.timeOfDay || []).includes(time)
+    );
+    if (medsAtTime.length > 0) {
+      schedule[time] = medsAtTime;
+    }
+  });
+
+  if (Object.keys(schedule).length === 0) return null;
+
+  const handleDownload = async () => {
+    const el = scheduleRef.current;
+    if (!el) return;
+
+    try {
+      // Use canvas to render the schedule as an image
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      
+      const padding = 32;
+      const rowHeight = 60;
+      const headerHeight = 80;
+      const timeSlots = Object.keys(schedule);
+      const maxMeds = Math.max(...timeSlots.map(t => schedule[t].length));
+      
+      const width = 600;
+      const height = headerHeight + (timeSlots.length * (rowHeight + (maxMeds * 36))) + padding * 2 + 40;
+      
+      canvas.width = width * 2; // 2x for retina
+      canvas.height = height * 2;
+      ctx.scale(2, 2);
+      
+      // Background
+      ctx.fillStyle = '#ffffff';
+      ctx.roundRect(0, 0, width, height, 16);
+      ctx.fill();
+      
+      // Header gradient
+      const grad = ctx.createLinearGradient(0, 0, width, headerHeight);
+      grad.addColorStop(0, '#0d9488');
+      grad.addColorStop(1, '#0f766e');
+      ctx.fillStyle = grad;
+      ctx.roundRect(0, 0, width, headerHeight, [16, 16, 0, 0]);
+      ctx.fill();
+      
+      // Title
+      ctx.fillStyle = '#ffffff';
+      ctx.font = 'bold 20px Outfit, sans-serif';
+      ctx.fillText('💊 MedMitra — ' + (hi ? 'दवा समय-सारणी' : 'Medicine Schedule'), padding, 35);
+      
+      if (patientName) {
+        ctx.font = '14px Outfit, sans-serif';
+        ctx.fillStyle = '#ccfbf1';
+        ctx.fillText((hi ? 'मरीज: ' : 'Patient: ') + patientName, padding, 58);
+      }
+      
+      // Date
+      ctx.font = '12px Outfit, sans-serif';
+      ctx.fillStyle = '#99f6e4';
+      const today = new Date().toLocaleDateString(hi ? 'hi-IN' : 'en-IN', { 
+        day: 'numeric', month: 'long', year: 'numeric' 
+      });
+      ctx.fillText(today, width - padding - ctx.measureText(today).width, 58);
+      
+      // Schedule rows
+      let y = headerHeight + padding;
+      
+      timeSlots.forEach(time => {
+        const info = TIME_LABELS[time];
+        const meds = schedule[time];
+        
+        // Time slot header
+        ctx.fillStyle = info.bg;
+        ctx.roundRect(padding, y, width - padding * 2, 32, 8);
+        ctx.fill();
+        
+        ctx.fillStyle = info.color;
+        ctx.font = 'bold 14px Outfit, sans-serif';
+        ctx.fillText(`${info.emoji}  ${hi ? info.hi : info.en}`, padding + 12, y + 22);
+        
+        y += 40;
+        
+        // Medicines in this slot
+        meds.forEach(med => {
+          const foodInfo = FOOD_LABELS[med.beforeOrAfterFood] || FOOD_LABELS.any;
+          
+          ctx.fillStyle = '#1e293b';
+          ctx.font = 'bold 13px Outfit, sans-serif';
+          ctx.fillText(`💊 ${med.name}`, padding + 20, y + 14);
+          
+          ctx.fillStyle = '#64748b';
+          ctx.font = '11px Outfit, sans-serif';
+          const dosageText = `${med.dosage} • ${hi ? foodInfo.hi : foodInfo.en}`;
+          ctx.fillText(dosageText, padding + 20, y + 30);
+          
+          y += 38;
+        });
+        
+        y += 10;
+      });
+      
+      // Footer
+      ctx.fillStyle = '#94a3b8';
+      ctx.font = '10px Outfit, sans-serif';
+      ctx.fillText(hi ? '⚕️ डॉक्टर की सलाह अवश्य लें • MedMitra AI द्वारा' : '⚕️ Always consult your doctor • Generated by MedMitra AI', padding, height - 16);
+      
+      // Download
+      const link = document.createElement('a');
+      link.download = `MedMitra_Schedule_${new Date().toISOString().split('T')[0]}.png`;
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+    } catch (err) {
+      console.error('Schedule download error:', err);
+      alert(hi ? 'डाउनलोड नहीं हो सका' : 'Could not download schedule');
+    }
+  };
+
+  return (
+    <div className="schedule-card fade-in-up">
+      <div className="schedule-header">
+        <div className="schedule-title">
+          <Calendar size={16} />
+          <span>{hi ? 'दैनिक दवा समय-सारणी' : 'Daily Medicine Schedule'}</span>
+        </div>
+        <button className="schedule-download-btn" onClick={handleDownload}>
+          <Download size={14} />
+          <span>{hi ? 'डाउनलोड' : 'Download'}</span>
+        </button>
+      </div>
+
+      <div className="schedule-body" ref={scheduleRef}>
+        {Object.entries(schedule).map(([time, meds]) => {
+          const info = TIME_LABELS[time];
+          return (
+            <div key={time} className="schedule-slot">
+              <div className="schedule-time" style={{ background: info.bg, color: info.color }}>
+                <span className="schedule-emoji">{info.emoji}</span>
+                <span>{hi ? info.hi : info.en}</span>
+              </div>
+              <div className="schedule-meds">
+                {meds.map((med, i) => {
+                  const foodInfo = FOOD_LABELS[med.beforeOrAfterFood] || FOOD_LABELS.any;
+                  return (
+                    <div key={i} className="schedule-med-row">
+                      <span className="schedule-med-name">💊 {med.name}</span>
+                      <span className="schedule-med-dose">{med.dosage}</span>
+                      <span className="schedule-med-food" style={{ color: info.color }}>
+                        {foodInfo.emoji} {hi ? foodInfo.hi : foodInfo.en}
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+      
+      <div className="schedule-footer">
+        {hi ? '⚕️ डॉक्टर की सलाह अवश्य लें' : '⚕️ Always consult your doctor before taking any medicine'}
+      </div>
+    </div>
+  );
+}

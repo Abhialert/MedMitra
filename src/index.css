@@ -1747,3 +1747,308 @@ h1, h2, h3, h4 {
     border: none;
   }
 }
+
+/* ═══════════════════════════════════════════════════════════════
+   DRUG INTERACTION CARD (hackathon-v2)
+   ═══════════════════════════════════════════════════════════════ */
+
+.interaction-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+}
+
+.interaction-header {
+  padding: 12px 14px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid var(--border);
+  background: var(--amber-dim);
+}
+
+.interaction-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.interaction-badge {
+  font-size: 10px;
+  background: var(--amber);
+  color: white;
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-weight: 600;
+}
+
+.interaction-loading {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 14px;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.interaction-error {
+  padding: 12px 14px;
+  font-size: 12px;
+  color: var(--error);
+}
+
+.interaction-body {
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.interaction-overall {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  border-radius: var(--radius-sm);
+  border: 1px solid;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.interaction-pair {
+  padding: 10px 14px;
+  border-left: 3px solid;
+  background: var(--bg-secondary);
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+}
+
+.pair-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 4px;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.pair-header strong {
+  font-size: 12px;
+  color: var(--text-primary);
+}
+
+.pair-severity {
+  font-size: 10px;
+  padding: 2px 8px;
+  border-radius: 8px;
+  font-weight: 600;
+}
+
+.pair-detail {
+  font-size: 12px;
+  color: var(--text-secondary);
+  line-height: 1.45;
+  margin: 0;
+}
+
+.pair-advice {
+  font-size: 11px;
+  color: var(--accent);
+  margin: 4px 0 0;
+  font-weight: 500;
+}
+
+.interaction-peek,
+.interaction-peek-safe {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 14px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.interaction-peek:hover,
+.interaction-peek-safe:hover {
+  filter: brightness(0.97);
+}
+
+.interaction-peek-safe {
+  color: var(--text-muted);
+  background: var(--bg-secondary);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   SHARE BUTTON (hackathon-v2)
+   ═══════════════════════════════════════════════════════════════ */
+
+.share-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--bg-card);
+  color: var(--text-primary);
+  font-size: 14px;
+  font-weight: 600;
+  font-family: var(--font);
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: var(--shadow-sm);
+}
+
+.share-btn:hover {
+  background: var(--accent-dim);
+  border-color: var(--accent);
+  color: var(--accent);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+}
+
+.share-btn:active {
+  transform: scale(0.98);
+}
+
+.share-btn.copied {
+  background: var(--success-dim);
+  border-color: var(--success);
+  color: var(--success);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   MEDICINE SCHEDULE CARD (hackathon-v2)
+   ═══════════════════════════════════════════════════════════════ */
+
+.schedule-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+}
+
+.schedule-header {
+  padding: 12px 14px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid var(--border);
+  background: linear-gradient(135deg, rgba(13, 148, 136, 0.04), rgba(59, 130, 246, 0.04));
+}
+
+.schedule-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--accent);
+}
+
+.schedule-download-btn {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 12px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--accent);
+  background: var(--accent-dim);
+  color: var(--accent);
+  font-size: 11px;
+  font-weight: 600;
+  font-family: var(--font);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.schedule-download-btn:hover {
+  background: var(--accent);
+  color: white;
+}
+
+.schedule-download-btn:active {
+  transform: scale(0.95);
+}
+
+.schedule-body {
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.schedule-slot {
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  border: 1px solid var(--border);
+}
+
+.schedule-time {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.schedule-emoji {
+  font-size: 16px;
+}
+
+.schedule-meds {
+  padding: 8px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.schedule-med-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  flex-wrap: wrap;
+}
+
+.schedule-med-name {
+  font-weight: 600;
+  color: var(--text-primary);
+  flex: 1;
+  min-width: 0;
+}
+
+.schedule-med-dose {
+  color: var(--text-secondary);
+  font-size: 11px;
+}
+
+.schedule-med-food {
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.schedule-footer {
+  padding: 8px 14px;
+  font-size: 10px;
+  color: var(--text-muted);
+  text-align: center;
+  border-top: 1px solid var(--border);
+  background: var(--bg-secondary);
+}
+
+/* Extra stagger delays for new components */
+.stagger > *:nth-child(11) { animation-delay: 0.5s; }
+.stagger > *:nth-child(12) { animation-delay: 0.55s; }
+

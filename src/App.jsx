@@ -8,6 +8,9 @@ import HistoryPage from './components/HistoryPage';
 import CommercialWrapper from './components/CommercialWrapper';
 import { analyzeMedicalDocument, analyzeMedicalDocumentQuiet } from './services/geminiService';
 import { saveToHistory } from './services/historyService';
+import DrugInteractionCard from './components/DrugInteractionCard';
+import ShareButton from './components/ShareButton';
+import MedicineScheduleCard from './components/MedicineScheduleCard';
 import { Pill, History } from 'lucide-react';
 
 function App() {
@@ -164,11 +167,21 @@ function App() {
             <Route path="/results" element={
               resultData ? (
                 <div className="stagger">
+                  <ShareButton data={resultData} language={language} />
                   <ResultsDisplay 
                     data={resultData} 
                     language={language}
                     capturedImage={capturedImage}
                     onReset={handleReset} 
+                  />
+                  <DrugInteractionCard 
+                    medicines={resultData.medicines} 
+                    language={language}
+                  />
+                  <MedicineScheduleCard 
+                    medicines={resultData.medicines}
+                    patientName={resultData.patientName}
+                    language={language}
                   />
                   <VerificationPanel 
                     medicines={resultData.medicines} 
