@@ -53,19 +53,21 @@ If and ONLY IF the image is a valid physical medicine or prescription, proceed t
 3. Identify the document type: "label" (for a medicine box/strip/bottle) or "prescription" (doctor's paper list).
 4. For EACH medicine clearly visible, provide:
    - name: The brand name exactly as written
-   - genericName: The chemical/generic name. USE YOUR MEDICAL KNOWLEDGE.
-   - usage: What this medicine is commonly prescribed for. USE YOUR MEDICAL KNOWLEDGE. Be specific.
+   - genericName: The chemical/generic name (e.g., "Paracetamol" for Crocin, "Metformin" for Glycomet). USE YOUR MEDICAL KNOWLEDGE.
+   - usage: What this medicine is commonly prescribed for. USE YOUR MEDICAL KNOWLEDGE even if not written on the label. Be specific (e.g., "Reduces fever and relieves headache, body pain").
    - condition: EXACTLY ONE keyword from this list that best describes what it treats: "fever", "pain", "heart", "diabetes", "stomach", "infection", "blood_pressure", "brain", "lungs", "skin", "bones", "eyes", "liver", "kidney", "allergy", "thyroid", "blood", "muscle", "ear", "dental", "vitamin", "general"
-   - dosage: How much to take in simple terms (e.g., "One tablet")
-   - sideEffects: Common side effects from YOUR MEDICAL KNOWLEDGE
-   - instructions: When/how to take (e.g., "Take after eating food")
+   - dosage: How much to take in simple terms (e.g., "One tablet" not "500mg")
+   - sideEffects: Common side effects from YOUR MEDICAL KNOWLEDGE (e.g., "May cause drowsiness or upset stomach")
+   - instructions: When/how to take (e.g., "Take after eating food, morning and night")
    - timeOfDay: Array of when to take: "morning", "afternoon", "evening", "night"
-   - beforeOrAfterFood: ONE of: "before", "after", "with", "any"
+   - beforeOrAfterFood: ONE of: "before", "after", "with", "any" — when to take relative to meals
 5. Give a simple summary of what the user should do.
 
 ${langInstruction}
 
 CRITICAL RULES:
+- USE YOUR OWN MEDICAL KNOWLEDGE for usage, side effects, and generic names. Do NOT rely only on what's written on the label.
+- Explain like you're talking to your grandmother. No medical jargon.
 - Output ONLY a JSON object (no markdown formatting, no backticks).
 - If rejected, return ONLY the "invalid" JSON.
 - Valid Document keys: "documentType", "patientName", "medicines" (array), "actionableInstructions"
