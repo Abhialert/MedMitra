@@ -8,16 +8,35 @@ const videoConstraints = {
   facingMode: 'environment'
 };
 
+const compressImage = (base64Str, maxWidth = 800) => {
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.src = base64Str;
+    img.onload = () => {
+      const canvas = document.createElement('canvas');
+      const ratio = Math.min(maxWidth / img.width, maxWidth / img.height, 1);
+      canvas.width = img.width * ratio;
+      canvas.height = img.height * ratio;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+      resolve(canvas.toDataURL('image/jpeg', 0.7)); // Compresses payload significantly
+    };
+    img.onerror = () => resolve(base64Str);
+  });
+};
+
 export default function CameraScanner({ onCapture, isProcessing, language }) {
   const webcamRef = useRef(null);
   const fileInputRef = useRef(null);
   const hi = language === 'hi';
 
-  const capture = useCallback(() => {
+  const capture = useCallback(async () => {
     if (webcamRef.current) {
       const imageSrc = webcamRef.current.getScreenshot();
       if (imageSrc) {
-        onCapture(imageSrc);
+        // Compress image before sending to AI to save bandwidth & processing time
+        const compressed = await compressImage(imageSrc);
+        onCapture(compressed);
       } else {
         alert(hi ? 'कैमरा तैयार नहीं है।' : 'Camera not ready or inaccessible.');
       }
@@ -28,8 +47,9 @@ export default function CameraScanner({ onCapture, isProcessing, language }) {
     const file = e.target.files[0];
     if (file) {
       const reader = new FileReader();
-      reader.onloadend = () => {
-        onCapture(reader.result);
+      reader.onloadend = async () => {
+        const compressed = await compressImage(reader.result);
+        onCapture(compressed);
       };
       reader.readAsDataURL(file);
     }

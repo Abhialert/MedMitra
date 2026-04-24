@@ -44,12 +44,15 @@ function App() {
       const otherLang = lang === 'en' ? 'hi' : 'en';
       if (!translationCache.current[otherLang]) {
         setIsCachingTranslation(true);
-        analyzeMedicalDocumentQuiet(imageSrc, otherLang).then((cached) => {
-          if (cached) {
-            translationCache.current[otherLang] = cached;
-          }
-          setIsCachingTranslation(false);
-        });
+        // Defer background translation to prevent quota limits/throttling and ensure UI responsiveness
+        setTimeout(() => {
+          analyzeMedicalDocumentQuiet(imageSrc, otherLang).then((cached) => {
+            if (cached) {
+              translationCache.current[otherLang] = cached;
+            }
+            setIsCachingTranslation(false);
+          });
+        }, 5000);
       }
     } catch (error) {
       console.error(error);

@@ -108,7 +108,9 @@ export default function ResultsDisplay({ data, language, capturedImage, onReset 
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
             <h2>{hi ? 'विश्लेषण' : 'Analysis'}</h2>
             <span className={`doc-badge ${data.documentType}`}>
-              {data.documentType === 'prescription'
+              {data.documentType === 'invalid'
+                ? (hi ? 'अमान्य छवि' : 'Invalid Image')
+                : data.documentType === 'prescription'
                 ? (hi ? 'प्रिस्क्रिप्शन' : 'Prescription')
                 : (hi ? 'लेबल' : 'Label')}
             </span>
